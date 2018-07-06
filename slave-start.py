@@ -54,7 +54,7 @@ def checkDomain(domain_obj):
     # # url = 'https://' + 'www.tt589.net'
     # 提交请求
     # start_time = time.time()
-    print(url)
+    #print(url)
     try:
         requests.adapters.DEFAULT_RETRIES = 5
         headers = {
@@ -109,7 +109,7 @@ def main():
     # 这里开始轮询
     while True:
         # 设定轮询间隔时间
-        print('开始')
+        print('Begin')
         time_remaining = INTERVAL - time.time() % INTERVAL
         # 整点开始
         time.sleep(time_remaining + 1)
@@ -133,7 +133,7 @@ def main():
             pool.close()
             # 等待所有子进程结束
             pool.join()
-            print('结束')
+            print('End')
 
 
 if __name__ == '__main__':

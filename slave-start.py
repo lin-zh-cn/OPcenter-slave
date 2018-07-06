@@ -26,6 +26,8 @@ def write_log(e):
         f.write(e)
 
 
+
+
 def fault_post(domain_obj,event_type_id):
     submitData = {
         'status': event_type_id,
@@ -110,7 +112,7 @@ def main():
         print('开始')
         time_remaining = INTERVAL - time.time() % INTERVAL
         # 整点开始
-        time.sleep(time_remaining + 1)
+        #time.sleep(time_remaining + 1)
 
         # 发送API请求 获取所有域名对象,连接失败会重试3次,
         session = requests.Session()
@@ -135,5 +137,8 @@ def main():
 
 
 if __name__ == '__main__':
+    pid_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'OPcenter-slave.pid')
+    with open(pid_file, 'w') as f:
+        f.write(str(os.getpid()))
     main()
 

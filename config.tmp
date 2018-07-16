@@ -4,7 +4,7 @@ INTERVAL = 300
 THREAD_NUM = 20
 
 # 服务器Ip地址
-SERVER = '139.199.77.249'
+SERVER = 'server_ip'
 
 # 服务器端口
-PORT = '8000'
+PORT = 'server_port'

@@ -2,5 +2,5 @@
 
 !.gitignore
 !slave-start.py
-!config.py
 !README.md
+!config.tmp

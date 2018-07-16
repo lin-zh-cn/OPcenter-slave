@@ -112,7 +112,7 @@ def main():
         print('Begin')
         time_remaining = INTERVAL - time.time() % INTERVAL
         # 整点开始
-        #time.sleep(time_remaining + 1)
+        time.sleep(time_remaining + 1)
 
         # 发送API请求 获取所有域名对象,连接失败会重试3次,
         session = requests.Session()

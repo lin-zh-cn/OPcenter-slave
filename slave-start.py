@@ -18,7 +18,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 requests.packages.urllib3.disable_warnings()
 
-
+NODE = None
 
 def write_log(e):
     log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'run.log')
@@ -118,12 +118,13 @@ def main():
         session = requests.Session()
         session.mount('http://', HTTPAdapter(max_retries=3))
 
-        domain_all_response = session.post("http://"+ SERVER +":"+ PORT +"/webmoni/api/domain_all/", data={'node': NODE})
+        domain_all_response = session.post("http://"+ SERVER +":"+ PORT +"/webmoni/api/domain_all/")
         # 重试3次依旧失败就发送邮件并写入错误日志,退出程序
 
         # 获取API返回的域名对象,放入检查域名的进程池检查
         domain_all = json.loads(domain_all_response.text)
         if domain_all['code'] == 0:
+            NODE = domain_all['node']
             # 创建进程池，进程数=THREAD_NUM，进程调用函数main，参数url_t
             pool = Pool(THREAD_NUM)
             for domain_obj in domain_all['data']:

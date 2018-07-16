@@ -1,1 +1,2 @@
-nohup python3 /wwwroot/OPcenter-slave/slave-start.py>/dev/null 2>/wwwroot/OPcenter-slave/error.log &
+###### OPcenter-slave
+    OPcenter-slave是OPcenter的数据采集节点

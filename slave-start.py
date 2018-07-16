@@ -18,7 +18,6 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 requests.packages.urllib3.disable_warnings()
 
-NODE = None
 
 def write_log(e):
     log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'run.log')
@@ -28,10 +27,10 @@ def write_log(e):
 
 
 
-def fault_post(domain_obj,event_type_id):
+def fault_post(domain_obj,event_type_id,Node):
     submitData = {
         'status': event_type_id,
-        'node': NODE,
+        'node': Node,
         'url_id': domain_obj['id'],
         'domain': domain_obj['url'],
         'time': int(time.time()),
@@ -47,7 +46,7 @@ def fault_post(domain_obj,event_type_id):
     return True
 
 # 域名检测
-def checkDomain(domain_obj):
+def checkDomain(domain_obj,Node):
     # 拼接url
 
     url = 'https://' + domain_obj['url']
@@ -68,7 +67,7 @@ def checkDomain(domain_obj):
         total_time = int((stop_time - start_time) * 1000)
         submitData = {
             'status':100,
-            'node': NODE,
+            'node_id': Node,
             'url_id': domain_obj['id'],
             'domain': domain_obj['url'],
             'time': int(time.time()),
@@ -76,6 +75,7 @@ def checkDomain(domain_obj):
             'total_time': total_time,
             'datetime': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
         }
+        print(submitData)
         normal_response = s.post("http://" + SERVER + ":" + PORT + "/webmoni/api/check_result_submit/",
                                  data={'submitData':json.dumps(submitData)},headers=headers)
         result = json.loads(normal_response.text)
@@ -84,22 +84,22 @@ def checkDomain(domain_obj):
         return True
 
     except ReadTimeout as e:
-        fault_post(domain_obj,3)
+        fault_post(domain_obj,3,Node)
         return False
     except LocationValueError as e:
-        fault_post(domain_obj,4)
+        fault_post(domain_obj,4,Node)
         return False
     except TooManyRedirects as e:
-        fault_post(domain_obj,5)
+        fault_post(domain_obj,5,Node)
         return False
     except ConnectTimeout as e:
-        fault_post(domain_obj,3)
+        fault_post(domain_obj,3,Node)
         return False
     except ConnectionError as e:
-        fault_post(domain_obj,7)
+        fault_post(domain_obj,7,Node)
         return False
     except Exception as e:
-        fault_post(domain_obj, 99)
+        fault_post(domain_obj, 99,Node)
         write_log(e)
 
 
@@ -112,7 +112,7 @@ def main():
         print('Begin')
         time_remaining = INTERVAL - time.time() % INTERVAL
         # 整点开始
-        time.sleep(time_remaining + 1)
+        #time.sleep(time_remaining + 1)
 
         # 发送API请求 获取所有域名对象,连接失败会重试3次,
         session = requests.Session()
@@ -124,12 +124,12 @@ def main():
         # 获取API返回的域名对象,放入检查域名的进程池检查
         domain_all = json.loads(domain_all_response.text)
         if domain_all['code'] == 0:
-            NODE = domain_all['node']
+            Node = domain_all['node']
             # 创建进程池，进程数=THREAD_NUM，进程调用函数main，参数url_t
             pool = Pool(THREAD_NUM)
             for domain_obj in domain_all['data']:
                 if domain_obj['check_id'] == 0:
-                    pool.apply_async(func=checkDomain, args=(domain_obj,))
+                    pool.apply_async(func=checkDomain, args=(domain_obj,Node))
             # 终止创建子进程
             pool.close()
             # 等待所有子进程结束

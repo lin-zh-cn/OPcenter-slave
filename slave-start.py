@@ -67,7 +67,7 @@ def checkDomain(domain_obj,Node):
         total_time = int((stop_time - start_time) * 1000)
         submitData = {
             'status':100,
-            'node_id': Node,
+            'node': Node,
             'url_id': domain_obj['id'],
             'domain': domain_obj['url'],
             'time': int(time.time()),
